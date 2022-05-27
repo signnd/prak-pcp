@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-plat = cv2.imread('plat.jpg', cv2.IMREAD_GRAYSCALE)
-th, plat_th = cv2.threshold(plat, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+plat = cv2.imread('plat-no.jpeg', cv2.IMREAD_GRAYSCALE)
+th, plat_th = cv2.threshold(plat, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
 plat_fld = plat_th.copy()
 h, w = plat_th.shape[:2]
@@ -12,7 +12,7 @@ cv2.floodFill(plat_fld, mask, (0,0), 255)
 plat_fld_inv = cv2.bitwise_not(plat_fld)
 plat_fore = plat_th | plat_fld_inv
 
-# cv2.imshow('Gambar Asli', plat)
+cv2.imshow('Gambar Asli', plat)
 cv2.imshow('Gambar Biner', plat_th)
 cv2.imshow('Gambar Floodfill', plat_fld)
 cv2.imshow('Gambar Invert', plat_fld_inv)
