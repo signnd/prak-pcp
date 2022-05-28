@@ -23,3 +23,5 @@ r = cv2.selectROI("gambar", plat_fld_inv)
 crop_roi = plat_fld_inv[int(r[1]):int(r[1]+r[3]),int(r[0]):int(r[0]+r[2])]
 cv2.imshow('test', crop_roi)
 cv2.waitKey(0)
+
+#ref https://catwolf.org/qs?id=e2ac8efd-a6f6-40fc-af5d-64bfa3af7230&x=y
