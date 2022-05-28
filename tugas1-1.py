@@ -1,46 +1,29 @@
-## DON'T RUN THIS
-## ref: https://pyimagesearch.com/2020/07/27/opencv-grabcut-foreground-segmentation-and-extraction/
-
-import numpy as np
 import cv2
-import time
-import os
-import argparse
+import numpy as np
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", type=str, default=os.path.sep.join(["images","plat.jpg"]),help="apply grabcut")
-ap.add_argument("-mask", "--mask", type=str, default=os.path.sep.join(["images","plat-mask.jpeg"]),help="path to input mask")
-ap.add_argument("-c", "--iter", type=int, default=10, help="# of Grabcut iterations")
-args = vars(ap.parse_args())
+img = cv2.imread('plat-no.jpeg')
 
-image = cv2.imread('plat-no.jpeg')
-mask = cv2.imread('plat-no.jpeg', cv2.IMREAD_GRAYSCALE)
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+gray = 255 - gray
+thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY)[1]
 
-roughOutput = cv2.bitwise_and(image, image, mask=mask)
+kernel = np.ones((3,3),np.uint8)
+mask = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
-cv2.imshow("Rough Output", roughOutput)
+contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+contours = contours[0] if len(contours) == 2 else contours[1]
+cntr = contours[0]
+x,y,w,h = cv2.boundingRect(cntr)
+
+# make background transparent by placing the mask into the alpha channel
+new_img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+new_img[:, :, 3] = mask
+
+# then crop it to bounding rectangle
+crop = new_img[y:y+h, x:x+w]
+cv2.imshow("THRESH", thresh)
+cv2.imshow("MASK", mask)
+cv2.imshow("CROP", crop)
 cv2.waitKey(0)
-
-mask[mask > 0] = cv2.GC_PR_FGD
-mask[mask == 0] = cv2.GC_BGD
-
-fgModel = np.zeros((1, 65), dtype="float")
-bgModel = np.zeros((1, 65), dtype="float")
-
-start = time.time()
-# (mask, bgModel, fgModel) = cv2.grabCut(image, mask, None, bgModel, fgModel, iterCount=args["iter"], mode=cv2.GC_INIT_WITH_MASK)
-end = time.time()
-
-values = (
-    ("Definite Background", cv2.GC_BGD),
-    ("Probable Background", cv2.GC_PR_BGD),
-    ("Definite Foreground", cv2.GC_FGD),
-    ("Probable Foreground", cv2.GC_PR_FGD),
-)
-
-for (name, value) in values:
-    # print("showing mask for '{}'".format(name))
-    valueMask = (mask == value).astype("uint8")*255
-
-    cv2.imshow(name, valueMask)
-    cv2.waitKey(0)
+cv2.destroyAllWindows()
