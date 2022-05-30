@@ -7,14 +7,20 @@ th, plat_th = cv2.threshold(plat, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
 plat_fld = plat_th.copy()
 plat_fld_in = cv2.bitwise_not(plat_fld)
-ply = cv2.erode(plat_fld_in, np.ones((7,7)))
+ply = cv2.dilate(plat_fld, np.ones((7,7)))
 ply = cv2.threshold(ply, 200, 255, cv2.THRESH_BINARY)[1]
-kernel = np.ones((9,9),np.uint8)
+kernel = np.ones((3,3),np.uint8)
 ply1 = cv2.dilate(ply, kernel,iterations = 1)
-h, w = plat_th.shape[:2]
+contours, h = cv2.findContours(ply1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+for c in contours:
+    x, y, w, h = cv2.boundingRect(c)
+    rect = cv2.rectangle(plat_fld, (x,y), (x+w, y+h), (0,255,0),2)
+    cropped = plat_fld[y:y+h, x:x+w]
+cv2.imshow('good luck', cropped)
+"""h, w = plat_th.shape[:2]
 mask = np.zeros((h+2, w+2), np.uint8)
 cv2.floodFill(plat_fld_in, mask, (0,0), 255)
-plat_fore = plat_fld | plat_fld_in
+plat_fore = plat_fld | plat_fld_in"""
 
 cv2.imshow('Gambar Asli', plat)
 cv2.imshow('Gambar Biner', plat_th)
