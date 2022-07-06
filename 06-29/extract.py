@@ -24,4 +24,4 @@ for filename in os.listdir(directory):
             features.append(target_class)
             #print(img, target_class, features)
 
-            data_training.append(festures)
+            calc_image.append(features)
