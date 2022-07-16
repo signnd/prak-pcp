@@ -32,9 +32,8 @@ print("[INFO] features matrix: {:.1f}MB".format(
 le = LabelEncoder()
 labels = le.fit_transform(labels)
 
-# partition the data into training and testing splits using 75% of
-# the data for training and the remaining 25% for testing
-(trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.1, random_state=42)
+# partition the data into training and testing splits using 80% of the data for training and the remaining 25% for testing
+(trainX, testX, trainY, testY) = train_test_split(data, labels, test_size=0.2, random_state=42)
 
 # train and evaluate a k-NN classifier on the raw pixel intensities
 print("[INFO] evaluating k-NN classifier...")
